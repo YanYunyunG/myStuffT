@@ -1,0 +1,10 @@
+ 
+ Short condition 1
+ 
+ 1. position is 0;
+  and 
+ 2. k_d < 0
+   and	
+ 3. Utils.isDownTread(sma5, sma15)
+   and
+ 4. Utils.isKDDownTrend( quoteHistory,k5Min, d5Min) 
