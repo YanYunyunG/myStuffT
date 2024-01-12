@@ -12,7 +12,6 @@ import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemListener;
-import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.WindowAdapter;
 import java.lang.reflect.Constructor;
@@ -391,13 +390,7 @@ public class MainFrame extends JFrame implements ModelListener {
 				foundLiquid = true;
 		}
 
-		// Add LiquidL&F if missing
-		if (!foundLiquid) {
-			UIManager.LookAndFeelInfo liquid = new UIManager.LookAndFeelInfo("LiquidLookAndFeel",
-			        "com.birosoft.liquid.LiquidLookAndFeel");
-			installedLaF.add(liquid);
-		}
-
+	
 		return installedLaF;
 	}
 }

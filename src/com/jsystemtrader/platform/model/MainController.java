@@ -32,8 +32,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.plaf.ColorUIResource;
 
-//import com.birosoft.liquid.LiquidLookAndFeel;
-import com.birosoft.liquid.LiquidLookAndFeel;
+
 import com.jsystemtrader.platform.backdata.BackDataDialog;
 import com.jsystemtrader.platform.backtest.BackTestStrategyRunner;
 import com.jsystemtrader.platform.chart.StrategyPerformanceChart;
@@ -60,9 +59,7 @@ public class MainController {
 
 	public MainController() throws JSystemTraderException, IOException {
 		boolean lookAndFeelMacTitle = preferences.getBool(LookAndFeelMacStyle);
-		if (lookAndFeelMacTitle)
-			LiquidLookAndFeel.setLiquidDecorations(true, "mac");
-
+		
 		String lookAndFeelClassName = preferences.get(LookAndFeelClassName);
 		_setLookAndFeel(lookAndFeelClassName);
 
@@ -311,8 +308,7 @@ public class MainController {
 		try {
 			UIManager.setLookAndFeel(lookAndFeelName);
 		} catch (Throwable t) {
-			MessageDialog.showMessage(null,
-			        t.getMessage() + ": Unable to set custom look & feel. The default L&F will be used.");
+			;//ignore the look and feel for now
 		}
 
 		// Set the color scheme explicitly

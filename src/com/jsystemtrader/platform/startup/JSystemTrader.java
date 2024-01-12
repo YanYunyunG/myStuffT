@@ -41,9 +41,7 @@ public class JSystemTrader {
             appPath = args[0];
             new JSystemTrader();
         } catch (Throwable t) {
-            MessageDialog.showError(null, t.toString() + "\n" + t.getMessage());
-            Dispatcher.getReporter().report(t);
-            t.printStackTrace();
+          ;//ignore
         }
     }
 
