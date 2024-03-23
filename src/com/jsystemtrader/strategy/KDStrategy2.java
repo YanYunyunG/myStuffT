@@ -11,7 +11,7 @@ import com.jsystemtrader.platform.schedule.TradingInterval;
 import com.jsystemtrader.platform.strategy.Strategy;
 import com.jsystemtrader.platform.util.ContractFactory;
 
-public class KDStrategy extends Strategy
+public class KDStrategy2 extends Strategy
 {
 	private static String K_5MIN_LENGTH="K 5Mins Length";
 	private static String D_5MIN_LENGTH="D 5Mins Length";
@@ -23,16 +23,13 @@ public class KDStrategy extends Strategy
 	private Indicator  k_indicator, d_indicator;
 	int k_barSize = 5; 
 	int d_len = 3;
-	private String _ticker = "RIM";
-	private String _stockExchange = "TSE";
-	private String _currency = "CAD";
 	
-    public KDStrategy(StrategyParams params)
+    public KDStrategy2(StrategyParams params)
         throws JSystemTraderException
     {
-    	contract = ContractFactory.makeStockContract("RIM1", "TSE", "CAD");
+    	contract = ContractFactory.makeStockContract("RIM2", "TSE2", "CAD2");
         setStrategy(contract, BarSize.Min5, false);
-        init();
+        init( );
 
         k_indicator = new StochasticK( quoteHistory,k_barSize , false );
         d_indicator = new StochasticD( quoteHistory,k_indicator, d_len, false );
@@ -78,6 +75,7 @@ public class KDStrategy extends Strategy
         {
         	return params;
         }
+        	
         params = 	new StrategyParams();
         params.add(RSV_LENGTH, 8D, 8D, 1D);
         params.add(K_5MIN_LENGTH, 5D, 5D, 1D);
@@ -140,8 +138,6 @@ public class KDStrategy extends Strategy
     
     private void init()
     {
-    	
-//    	setDefaultValuesFromPreferences();
     	 StrategyParams params = getParams();
 //    
 //    	 rsv_length = params.getAvarage(RSV_LENGTH,8D);

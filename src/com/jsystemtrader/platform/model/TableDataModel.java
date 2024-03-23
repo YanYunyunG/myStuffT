@@ -1,8 +1,11 @@
 package com.jsystemtrader.platform.model;
 
-import javax.swing.table.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
+import javax.swing.table.AbstractTableModel;
+
+@SuppressWarnings("serial")
 public class TableDataModel extends AbstractTableModel {
     private String[] schema;
     private final List<Object> rows;
@@ -22,7 +25,6 @@ public class TableDataModel extends AbstractTableModel {
         changedItem[col] = value;
         fireTableCellUpdated(row, col);
     }
-
 
     protected void removeAllData() {
         rows.clear();

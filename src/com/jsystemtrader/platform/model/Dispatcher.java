@@ -1,13 +1,14 @@
 package com.jsystemtrader.platform.model;
 
-import com.jsystemtrader.platform.dialog.*;
-import com.jsystemtrader.platform.optimizer.*;
-import com.jsystemtrader.platform.report.*;
-import com.jsystemtrader.platform.trader.*;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.CountDownLatch;
 
-import java.io.*;
-import java.util.*;
-import java.util.concurrent.*;
+import com.jsystemtrader.platform.dialog.TradingModeDialog;
+import com.jsystemtrader.platform.optimizer.OptimizerDialog;
+import com.jsystemtrader.platform.report.Report;
+import com.jsystemtrader.platform.trader.Trader;
 
 /**
  * Acts as the dispatcher of the services.

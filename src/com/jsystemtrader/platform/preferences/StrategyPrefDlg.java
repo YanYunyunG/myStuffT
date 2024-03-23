@@ -31,19 +31,17 @@ import com.jsystemtrader.platform.util.MessageDialog;
 import com.jsystemtrader.platform.util.SpringUtilities;
 import com.jsystemtrader.platform.util.TitledSeparator;
 
+@SuppressWarnings("serial") // Same-version serialization only
 public class StrategyPrefDlg extends JDialog {
 
-	private static final String lineSep = System.getProperty("line.separator");
 	private static final Dimension MIN_SIZE = new Dimension(800, 600);// minimum frame size
 
 	private JButton cancelButton;
 	private JButton okButton;
-	private JButton addTicker_bt;
-	private JButton deleteTicker_bt;
-	private JComboBox strategyCombo;
+	private JButton resetButton;
+	private JComboBox<Strategy> strategyCombo;
 
 	private ParamTableModel paramTableModel;
-
 	private StrategyTickerTableModel tickerPrefTableModel;
 
 	private JTable strategyPreferenceTable;
@@ -51,25 +49,24 @@ public class StrategyPrefDlg extends JDialog {
 
 	public StrategyPrefDlg(JFrame parent) throws JSystemTraderException {
 		super(parent);
-
 		if (parent instanceof MainFrame) {
 			strategyList = ((MainFrame) parent).getTradingTableModel().getAllStrategies();
 		}
 		init();
 		initParams();
+	
+		pack();
+		assignListeners();
+		setLocationRelativeTo(null);
+	}
+
+	private void assignListeners() {
+
 		addWindowListener(new WindowAdapter() {
 			public void windowOpened(WindowEvent e) {
 				strategyCombo.requestFocus();
 			}
 		});
-		pack();
-		assignListeners();
-		setLocationRelativeTo(null);
-
-		setVisible(true);
-	}
-
-	private void assignListeners() {
 
 		strategyCombo.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -86,22 +83,21 @@ public class StrategyPrefDlg extends JDialog {
 
 		cancelButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-
 				dispose();
 			}
 		});
 
-		addTicker_bt.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				updateTickerTable(true);
-			}
-		});
+//		addTicker_bt.addActionListener(new ActionListener() {
+//			public void actionPerformed(ActionEvent e) {
+//				updateTickerTable(true);
+//			}
+//		});
 
-		deleteTicker_bt.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				updateTickerTable(false);
-			}
-		});
+//		deleteTicker_bt.addActionListener(new ActionListener() {
+//			public void actionPerformed(ActionEvent e) {
+//				updateTickerTable(false);
+//			}
+//		});
 
 		addWindowListener(new WindowAdapter() {
 			@Override
@@ -116,21 +112,10 @@ public class StrategyPrefDlg extends JDialog {
 		((Strategy) strategyCombo.getSelectedItem()).saveParamsToPreferences(paramTableModel.getParams());
 	}
 
-	private void updateTickerTable(boolean add) {
-		try {
-			if (add) {
-				tickerPrefTableModel.addTickerPreference(new StrategyPreference("TickerSymbol", 100, "9:00", "15:56"));
-			} else {
-				tickerPrefTableModel.removeRowAt(strategyPreferenceTable.getSelectedRow());
-			}
-		} catch (Exception _e) {
-			_e.printStackTrace();
-		}
-	}
-
 	private void init() throws JSystemTraderException {
 
 		setModal(true);
+	
 		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 		setTitle("Strategy Preferences");
 
@@ -144,14 +129,14 @@ public class StrategyPrefDlg extends JDialog {
 		JPanel strategyPanel = new JPanel(new SpringLayout());
 		JLabel strategyLabel = new JLabel("Strategy Name:", JLabel.TRAILING);
 
-		strategyCombo = new JComboBox();
+		strategyCombo = new JComboBox<Strategy>();
 		if (strategyList != null) {
 			for (int idx = 0; idx < strategyList.size(); idx++) {
 				strategyCombo.addItem(strategyList.get(idx));
 			}
 		}
 
-		Dimension size = new Dimension(150, 20);
+		Dimension size = new Dimension(250, 20);
 		strategyCombo.setPreferredSize(size);
 		strategyCombo.setMaximumSize(size);
 
@@ -179,25 +164,12 @@ public class StrategyPrefDlg extends JDialog {
 		tickerPreferencePanel.add(tickerPrefScrollPane);
 		SpringUtilities.makeOneLineGrid(tickerPreferencePanel, 1);
 
-		// add/delete button
-		// strategy panel and its components
-		JPanel addDeleteBtPanel = new JPanel(new SpringLayout());
-
-		addTicker_bt = new JButton("Add");
-		deleteTicker_bt = new JButton("Delete");
-
-		addDeleteBtPanel.add(addTicker_bt);
-		addDeleteBtPanel.add(deleteTicker_bt);
-		SpringUtilities.makeOneLineGrid(addDeleteBtPanel, 2);
-
 		northPanel.add(new TitledSeparator(new JLabel("Strategy definition & tickers")));
 		northPanel.add(strategyPanel);
 		northPanel.add(tickerPreferencePanel);
-		northPanel.add(addDeleteBtPanel);
-		SpringUtilities.makeCompactGrid(northPanel, 4, 1, 5, 12, 8, 8);
+		SpringUtilities.makeCompactGrid(northPanel, 3, 1, 5, 12, 8, 8);
 
 		////////////////////////// Center pane ////////
-
 		// strategy parametrs panel and its components
 		JPanel strategyParamPanel = new JPanel(new SpringLayout());
 		JScrollPane paramScrollPane = new JScrollPane();
@@ -219,17 +191,21 @@ public class StrategyPrefDlg extends JDialog {
 		/////////////////////////////////////// southPanel//////////////////
 		cancelButton = new JButton("Cancel");
 		cancelButton.setMnemonic('C');
-		cancelButton.setEnabled(false);
+
+		resetButton = new JButton("Rest Initial Values");
+		resetButton.setMnemonic('R');
+		
 		okButton = new JButton("OK");
 		okButton.setMnemonic('O');
 
 		JPanel buttonsPanel = new JPanel();
 		buttonsPanel.add(okButton);
 		buttonsPanel.add(cancelButton);
+		buttonsPanel.add(resetButton);
 
 		southPanel.add(buttonsPanel, BorderLayout.SOUTH);
 
-////////////////////////////////////////////////////////////////////////////////
+		////////////////////////////////////////////////////////////////////////////////
 		getContentPane().add(northPanel, BorderLayout.NORTH);
 		getContentPane().add(centerPanel, BorderLayout.CENTER);
 		getContentPane().add(southPanel, BorderLayout.SOUTH);

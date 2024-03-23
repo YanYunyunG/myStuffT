@@ -1,13 +1,19 @@
 package com.jsystemtrader.platform.position;
 
-import com.ib.client.*;
-import com.jsystemtrader.platform.model.*;
-import com.jsystemtrader.platform.report.*;
-import com.jsystemtrader.platform.strategy.*;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.commons.math.stat.descriptive.moment.StandardDeviation;
 
-import java.text.*;
-import java.util.*;
+import com.ib.client.Contract;
+import com.ib.client.Order;
+import com.jsystemtrader.platform.model.Dispatcher;
+import com.jsystemtrader.platform.model.ModelListener;
+import com.jsystemtrader.platform.report.Report;
+import com.jsystemtrader.platform.report.ReportRenderer;
+import com.jsystemtrader.platform.strategy.Strategy;
 
 /**
  * Position manager keeps track of current positions and P&L.

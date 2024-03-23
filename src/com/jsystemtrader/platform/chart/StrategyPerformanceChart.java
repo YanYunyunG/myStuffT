@@ -1,28 +1,74 @@
 package com.jsystemtrader.platform.chart;
 
-import com.jsystemtrader.indicator.*;
-import com.jsystemtrader.platform.model.*;
-import com.jsystemtrader.platform.position.*;
-import com.jsystemtrader.platform.preferences.PreferencesHolder;
-import static com.jsystemtrader.platform.preferences.JSTPreferences.*;
-import com.jsystemtrader.platform.quote.*;
-import com.jsystemtrader.platform.strategy.*;
-import com.jsystemtrader.platform.util.*;
-import org.jfree.chart.*;
-import org.jfree.chart.axis.*;
-import org.jfree.chart.plot.*;
-import org.jfree.chart.renderer.xy.*;
-import org.jfree.data.time.*;
-import org.jfree.data.xy.*;
-import org.jfree.ui.*;
+import static com.jsystemtrader.platform.preferences.JSTPreferences.ChartHeight;
+import static com.jsystemtrader.platform.preferences.JSTPreferences.ChartState;
+import static com.jsystemtrader.platform.preferences.JSTPreferences.ChartWidth;
+import static com.jsystemtrader.platform.preferences.JSTPreferences.ChartX;
+import static com.jsystemtrader.platform.preferences.JSTPreferences.ChartY;
 
-import javax.swing.*;
-import javax.swing.border.*;
-import java.awt.*;
-import java.awt.event.*;
-import java.awt.geom.*;
-import java.util.*;
+import java.awt.BasicStroke;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Container;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.GradientPaint;
+import java.awt.Paint;
+import java.awt.Rectangle;
+import java.awt.Window;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.awt.geom.Ellipse2D;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.TimeZone;
+
+import javax.swing.BorderFactory;
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.SpringLayout;
+import javax.swing.border.Border;
+import javax.swing.border.EtchedBorder;
+import javax.swing.border.TitledBorder;
+
+import org.jfree.chart.JFreeChart;
+import org.jfree.chart.axis.DateAxis;
+import org.jfree.chart.axis.NumberAxis;
+import org.jfree.chart.axis.SegmentedTimeLine;
+import org.jfree.chart.plot.CombinedDomainXYPlot;
+import org.jfree.chart.plot.PlotOrientation;
+import org.jfree.chart.renderer.xy.AbstractXYItemRenderer;
+import org.jfree.chart.renderer.xy.CandlestickRenderer;
+import org.jfree.chart.renderer.xy.StandardXYItemRenderer;
+import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
+import org.jfree.chart.ui.RectangleEdge;
+import org.jfree.chart.ui.TextAnchor;
+import org.jfree.data.time.Second;
+import org.jfree.data.time.TimeSeries;
+import org.jfree.data.time.TimeSeriesCollection;
+import org.jfree.data.xy.DefaultHighLowDataset;
+import org.jfree.data.xy.OHLCDataset;
+
+import com.jsystemtrader.indicator.ChartableIndicator;
+import com.jsystemtrader.indicator.IndicatorValue;
+import com.jsystemtrader.platform.model.Dispatcher;
+import com.jsystemtrader.platform.model.JSystemTraderException;
+import com.jsystemtrader.platform.position.Position;
+import com.jsystemtrader.platform.position.ProfitAndLoss;
+import com.jsystemtrader.platform.position.ProfitAndLossHistory;
+import com.jsystemtrader.platform.preferences.PreferencesHolder;
+import com.jsystemtrader.platform.quote.PriceBar;
+import com.jsystemtrader.platform.quote.QuoteHistory;
+import com.jsystemtrader.platform.strategy.Strategy;
+import com.jsystemtrader.platform.util.SpringUtilities;
 
 
 /**
@@ -76,7 +122,7 @@ public class StrategyPerformanceChart {
         int timeLineType = timeLineCombo == null ? 0 : timeLineCombo.getSelectedIndex();
         QuoteHistory qh = strategy.getQuoteHistory();
         MarketTimeLine mtl = new MarketTimeLine(qh);
-        SegmentedTimeline segmentedTimeline = (timeLineType == 0) ? mtl.getAllHours() : mtl.getNormalHours();
+        SegmentedTimeLine segmentedTimeline = (timeLineType == 0) ? mtl.getAllHours() : mtl.getNormalHours();
         dateAxis.setTimeline(segmentedTimeline);
     }
 
@@ -215,7 +261,9 @@ public class StrategyPerformanceChart {
         if (chartX >= 0 && chartY >= 0 && chartHeight > 0 && chartWidth > 0)
             chartFrame.setBounds(chartX, chartY, chartWidth, chartHeight);
         else
-            RefineryUtilities.centerFrameOnScreen(chartFrame);
+//            RefineryUtilities.centerFrameOnScreen(chartFrame);
+        	//http://www.java2s.com/example/java-src/pkg/org/jfree/chart/ui/refineryutilities-12e68.html
+        this.positionFrameOnScreen( chartFrame, 0.5, 0.5 );
 
         chartFrame.addWindowListener(new WindowAdapter() {
             @Override
@@ -231,11 +279,23 @@ public class StrategyPerformanceChart {
 
         return chartFrame;
     }
+    private void positionFrameOnScreen(final Window frame, final double horizontalPercent,
+            final double verticalPercent) {
+
+        final Rectangle s = frame.getGraphicsConfiguration().getBounds();
+        final Dimension f = frame.getSize();
+        final int w = Math.max(s.width - f.width, 0);
+        final int h = Math.max(s.height - f.height, 0);
+        final int x = (int) (horizontalPercent * w) + s.x;
+        final int y = (int) (verticalPercent * h) + s.y;
+        frame.setBounds(x, y, f.width, f.height);
+
+    }
 
 
     private TimeSeries createIndicatorSeries(ChartableIndicator chartableIndicator) {
 
-        TimeSeries ts = new TimeSeries(chartableIndicator.getName(), Second.class);
+        TimeSeries ts = new TimeSeries(chartableIndicator.getName());
         ts.setRangeDescription(chartableIndicator.getName());
 
         List<IndicatorValue> values = chartableIndicator.getIndicator().getHistory();
@@ -255,7 +315,7 @@ public class StrategyPerformanceChart {
 
     private TimeSeries createProfitAndLossSeries(ProfitAndLossHistory plHistory) {
 
-        TimeSeries ts = new TimeSeries("P&L", Second.class);
+        TimeSeries ts = new TimeSeries("P&L");
         ts.setRangeDescription("P&L");
 
         synchronized (plHistory) {
@@ -302,7 +362,7 @@ public class StrategyPerformanceChart {
         // create OHLC bar renderer
         mcbRenderer = new MultiColoredBarRenderer();
         mcbRenderer.setSeriesPaint(0, Color.WHITE);
-        mcbRenderer.setBaseStroke(new BasicStroke(3));
+        mcbRenderer.setDefaultStroke(new BasicStroke(3));
         mcbRenderer.setSeriesPaint(0, new Color(250, 240, 150));
 
         // create candlestick renderer
@@ -312,7 +372,7 @@ public class StrategyPerformanceChart {
         candleRenderer.setUpPaint(Color.GREEN);
         candleRenderer.setDownPaint(Color.RED);
         candleRenderer.setSeriesPaint(0, new Color(250, 240, 150));
-        candleRenderer.setBaseStroke(new BasicStroke(1));
+        candleRenderer.setDefaultStroke(new BasicStroke(1));
 
         dateAxis = new DateAxis();
 
@@ -413,7 +473,7 @@ public class StrategyPerformanceChart {
                 renderer.setSeriesShape(0, new Ellipse2D.Double(-2, -2, 4, 4));
             } else {
                 renderer = new StandardXYItemRenderer();
-                renderer.setBaseStroke(new BasicStroke(2));
+                renderer.setDefaultStroke(new BasicStroke(2));
             }
 
             if (subChart == 0) {

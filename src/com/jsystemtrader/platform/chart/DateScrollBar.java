@@ -1,19 +1,26 @@
 package com.jsystemtrader.platform.chart;
 
-import org.jfree.chart.axis.*;
-import org.jfree.chart.event.*;
-import org.jfree.chart.plot.*;
-import org.jfree.chart.renderer.*;
-import org.jfree.data.*;
-import org.jfree.data.xy.*;
+import java.awt.event.AdjustmentEvent;
+import java.awt.event.AdjustmentListener;
+import java.util.List;
 
-import javax.swing.*;
-import java.awt.event.*;
-import java.util.*;
+import javax.swing.JScrollBar;
+
+import org.jfree.chart.axis.DateAxis;
+import org.jfree.chart.axis.Timeline;
+import org.jfree.chart.event.AxisChangeEvent;
+import org.jfree.chart.event.AxisChangeListener;
+import org.jfree.chart.plot.CombinedDomainXYPlot;
+import org.jfree.chart.plot.XYPlot;
+import org.jfree.chart.renderer.RendererUtils;
+import org.jfree.data.Range;
+import org.jfree.data.xy.OHLCDataset;
+import org.jfree.data.xy.XYDataset;
 
 /**
  * Scroll bar for a combined chart where the horizontal axis represents dates
  */
+@SuppressWarnings("serial")
 public class DateScrollBar extends JScrollBar implements AdjustmentListener, AxisChangeListener {
 
     private static final int STEPS = 10000;
@@ -52,7 +59,7 @@ public class DateScrollBar extends JScrollBar implements AdjustmentListener, Axi
                 OHLCDataset ohlcDataset = isOHLC ? (OHLCDataset) dataset : null;
 
                 for (int series = 0; series < seriesCount; series++) {
-                    int[] itemBounds = RendererUtilities.findLiveItems(dataset, series, lowerBound, upperBound);
+                    int[] itemBounds = RendererUtils.findLiveItems(dataset, series, lowerBound, upperBound);
                     int firstItem = itemBounds[0];
                     int lastItem = itemBounds[1];
 

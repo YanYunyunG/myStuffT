@@ -28,7 +28,6 @@ public class JSystemTrader {
 
     /**
      * Starts JSystemTrader application.
-     *
      * @param args
      */
     public static void main(String[] args) {
@@ -41,10 +40,11 @@ public class JSystemTrader {
             appPath = args[0];
             new JSystemTrader();
         } catch (Throwable t) {
-          ;//ignore
+            MessageDialog.showError(null, t.toString() + "\n" + t.getMessage());
+            Dispatcher.getReporter().report(t);
+            t.printStackTrace();
         }
     }
-
     public static String getAppPath() {
         return appPath;
     }

@@ -1,6 +1,6 @@
 package com.jsystemtrader.platform.util;
 
-import com.ib.client.*;
+import com.ib.client.Contract;
 
 public class ContractFactory {
 

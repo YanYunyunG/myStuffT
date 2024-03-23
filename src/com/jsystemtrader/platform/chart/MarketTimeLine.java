@@ -1,7 +1,9 @@
 package com.jsystemtrader.platform.chart;
 
-import com.jsystemtrader.platform.quote.*;
-import org.jfree.chart.axis.*;
+import org.jfree.chart.axis.SegmentedTimeLine;
+
+import com.jsystemtrader.platform.quote.PriceBar;
+import com.jsystemtrader.platform.quote.QuoteHistory;
 
 
 public class MarketTimeLine {
@@ -9,7 +11,7 @@ public class MarketTimeLine {
      * Gaps less than MAX_GAP will be ignored, gaps greater than MAX_GAP will be removed
      */
     private static final long MAX_GAP = 12 * 60 * 60 * 1000;// 12 hours
-    private static final long SEGMENT_SIZE = SegmentedTimeline.FIFTEEN_MINUTE_SEGMENT_SIZE;
+    private static final long SEGMENT_SIZE = SegmentedTimeLine.FIFTEEN_MINUTE_SEGMENT_SIZE;
     private static final long GAP_BUFFER = SEGMENT_SIZE;
     private final QuoteHistory qh;
 
@@ -17,8 +19,8 @@ public class MarketTimeLine {
         this.qh = qh;
     }
 
-    public SegmentedTimeline getNormalHours() {
-        SegmentedTimeline timeline = new SegmentedTimeline(SEGMENT_SIZE, 1, 0);
+    public SegmentedTimeLine getNormalHours() {
+        SegmentedTimeLine timeline = new SegmentedTimeLine(SEGMENT_SIZE, 1, 0);
         long previousTime = qh.getFirstPriceBar().getDate();
 
         for (PriceBar bar : qh.getAll()) {
@@ -33,7 +35,7 @@ public class MarketTimeLine {
         return timeline;
     }
 
-    public SegmentedTimeline getAllHours() {
-        return new SegmentedTimeline(SegmentedTimeline.DAY_SEGMENT_SIZE, 7, 0);
+    public SegmentedTimeLine getAllHours() {
+        return new SegmentedTimeLine(SegmentedTimeLine.DAY_SEGMENT_SIZE, 7, 0);
     }
 }

@@ -31,7 +31,6 @@ import com.jsystemtrader.platform.schedule.TradingSchedule;
 public abstract class Strategy {
 
 	public static final String SECOND_QH = "_second";
-
 	private static final String NOT_APPLICABLE = "N/A";
 
 	private List<String> strategyReportHeaders;
@@ -57,9 +56,7 @@ public abstract class Strategy {
 	private final String name;
 	protected int position;
 	private boolean hasValidIndicators;
-
-	private boolean hasSecondValidIndicators;
-
+	
 	private int myCount = 0;
 
 	// following added by yan.
@@ -116,7 +113,11 @@ public abstract class Strategy {
 
 		eventReport = Dispatcher.getReporter();
 		isActive = true;
-
+		setDefaultValuesFromPreferences();
+	}
+	
+	public String getName() {
+		return name;
 	}
 
 	public void setContractorTicker(String ticker) {
@@ -163,15 +164,7 @@ public abstract class Strategy {
 
 	@Override
 	public String toString() {
-		StringBuilder sb = new StringBuilder();
-		sb.append(" ").append(name);
-		sb.append(" [");
-		sb.append(contract.m_symbol).append("-");
-		sb.append(contract.m_secType).append("-");
-		sb.append(contract.m_exchange).append("-");
-		sb.append(barSize.toString()).append("]");
-
-		return sb.toString();
+		return name;
 	}
 
 	public void update() {
@@ -326,10 +319,6 @@ public abstract class Strategy {
 		return onlyRTHPriceBars;
 	}
 
-	public String getName() {
-		return name;
-	}
-
 	public PriceBar getLastPriceBar() {
 		return quoteHistory.getLastPriceBar();
 	}
@@ -469,11 +458,9 @@ public abstract class Strategy {
 
 	public void saveParamsToPreferences(StrategyParams sparams) {
 		PreferencesHolder.getInstance().setStrategyPreferences(prefereceParamsPrex + name, sparams.toString());
-
 	}
 
-	private void setDefaultValuesFromPreferences() {
-
+	protected void setDefaultValuesFromPreferences() {
 		try {
 			PreferencesHolder preferences = PreferencesHolder.getInstance();
 			String sprefsValue = preferences.getStrategyPreferences(preferecePrex + name);
@@ -492,7 +479,6 @@ public abstract class Strategy {
 					tradingEndTime = spref.getTradeEndTime();
 				}
 			}
-
 			String paramsValue = preferences.getStrategyPreferences(prefereceParamsPrex + name);
 
 			if (paramsValue != null && paramsValue.length() > 0) {

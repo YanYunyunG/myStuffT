@@ -1,7 +1,5 @@
 package com.jsystemtrader.platform.model;
 
-import static com.jsystemtrader.platform.preferences.JSTPreferences.LookAndFeelClassName;
-import static com.jsystemtrader.platform.preferences.JSTPreferences.LookAndFeelMacStyle;
 import static com.jsystemtrader.platform.preferences.JSTPreferences.MainWindowHeight;
 import static com.jsystemtrader.platform.preferences.JSTPreferences.MainWindowWidth;
 import static com.jsystemtrader.platform.preferences.JSTPreferences.MainWindowX;
@@ -14,8 +12,6 @@ import static com.jsystemtrader.platform.preferences.JSTPreferences.OptimizerY;
 import java.awt.Cursor;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
@@ -32,7 +28,6 @@ import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.plaf.ColorUIResource;
 
-
 import com.jsystemtrader.platform.backdata.BackDataDialog;
 import com.jsystemtrader.platform.backtest.BackTestStrategyRunner;
 import com.jsystemtrader.platform.chart.StrategyPerformanceChart;
@@ -46,7 +41,6 @@ import com.jsystemtrader.platform.preferences.StrategyPrefDlg;
 import com.jsystemtrader.platform.startup.JSystemTrader;
 import com.jsystemtrader.platform.strategy.Strategy;
 import com.jsystemtrader.platform.strategy.StrategyRunner;
-import com.jsystemtrader.platform.util.Browser;
 import com.jsystemtrader.platform.util.MessageDialog;
 
 /**
@@ -58,17 +52,14 @@ public class MainController {
 	private final PreferencesHolder preferences = PreferencesHolder.getInstance();
 
 	public MainController() throws JSystemTraderException, IOException {
-		boolean lookAndFeelMacTitle = preferences.getBool(LookAndFeelMacStyle);
-		
-		String lookAndFeelClassName = preferences.get(LookAndFeelClassName);
+
+		String lookAndFeelClassName = "javax.swing.plaf.nimbus.NimbusLookAndFeel";
 		_setLookAndFeel(lookAndFeelClassName);
 
 		mainFrame = new MainFrame();
 		tradingModeDialog = new TradingModeDialog(mainFrame);
-
-		mainFrame.setSelectedLookAndFeel(lookAndFeelClassName);
-		mainFrame.setMacWindowTitle(lookAndFeelMacTitle);
-
+//		mainFrame.setSelectedLookAndFeel(lookAndFeelClassName);
+//		mainFrame.setMacWindowTitle(lookAndFeelMacTitle);
 		assignListeners();
 	}
 
@@ -257,23 +248,6 @@ public class MainController {
 			}
 		});
 
-		mainFrame.lookAndFeelAction(new ItemListener() {
-			public void itemStateChanged(ItemEvent e) {
-				if (e.getStateChange() == ItemEvent.SELECTED) {
-					String newLook = mainFrame.getSelectedLookAndFeel();
-					preferences.set(LookAndFeelClassName, newLook);
-					_setLookAndFeel(newLook);
-				}
-			}
-		});
-
-		mainFrame.macWindowTitleAction(new ItemListener() {
-			public void itemStateChanged(ItemEvent e) {
-				preferences.set(LookAndFeelMacStyle, e.getStateChange() == ItemEvent.SELECTED);
-				MessageDialog.showMessage(mainFrame, "Liquid mac decoration will take effect after restarting JST");
-			}
-		});
-
 		mainFrame.preferencesAction(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				try {
@@ -308,7 +282,8 @@ public class MainController {
 		try {
 			UIManager.setLookAndFeel(lookAndFeelName);
 		} catch (Throwable t) {
-			;//ignore the look and feel for now
+			MessageDialog.showMessage(null,
+			        t.getMessage() + ": Unable to set custom look & feel. The default L&F will be used.");
 		}
 
 		// Set the color scheme explicitly

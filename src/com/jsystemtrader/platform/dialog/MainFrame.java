@@ -11,29 +11,22 @@ import java.awt.Image;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ItemListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.WindowAdapter;
 import java.lang.reflect.Constructor;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Vector;
 
-import javax.swing.ButtonGroup;
 import javax.swing.JButton;
-import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
-import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
-import javax.swing.UIManager;
 import javax.swing.table.TableColumnModel;
 
 import com.jsystemtrader.platform.model.Dispatcher;
@@ -52,15 +45,10 @@ import com.jsystemtrader.platform.util.DoubleRenderer;
  * Main application window.
  */
 public class MainFrame extends JFrame implements ModelListener {
-	private JMenuItem optimizerMenuItem, exitMenuItem, aboutMenuItem, userGuideMenuItem, discussionMenuItem,
-	        projectHomeMenuItem, IBDataMenuItem, OTDataMenuItem, preferencesMenuItem, resizeTableMenuItem;
+	private JMenuItem optimizerMenuItem, exitMenuItem, IBDataMenuItem, OTDataMenuItem, preferencesMenuItem, resizeTableMenuItem;
 
 	private JMenuItem strategyPreferencesMenuItem;
-
-	private JCheckBoxMenuItem macWindowTitleMenuItem;
 	private JButton runButton, viewChartButton;
-	private List<JRadioButtonMenuItem> lookAndFeelMenuItems;
-	private ButtonGroup buttonGroupLookAndFeel;
 	private TradingTableModel tradingTableModel;
 	private JTable tradingTable;
 	private final String fileSep = System.getProperty("file.separator");
@@ -68,9 +56,6 @@ public class MainFrame extends JFrame implements ModelListener {
 	private int limitTableResize;
 
 	public MainFrame() throws JSystemTraderException {
-
-		lookAndFeelMenuItems = new ArrayList<JRadioButtonMenuItem>();
-
 		Dispatcher.addListener(this);
 		init();
 		populateStrategies();
@@ -111,18 +96,6 @@ public class MainFrame extends JFrame implements ModelListener {
 		}
 	}
 
-	public void userGuideAction(ActionListener action) {
-		userGuideMenuItem.addActionListener(action);
-	}
-
-	public void discussionAction(ActionListener action) {
-		discussionMenuItem.addActionListener(action);
-	}
-
-	public void projectHomeAction(ActionListener action) {
-		projectHomeMenuItem.addActionListener(action);
-	}
-
 	public void runStrategiesAction(ActionListener action) {
 		runButton.addActionListener(action);
 	}
@@ -147,26 +120,12 @@ public class MainFrame extends JFrame implements ModelListener {
 		addWindowListener(action);
 	}
 
-	public void aboutAction(ActionListener action) {
-		aboutMenuItem.addActionListener(action);
-	}
-
 	public void strategyChartAction(ActionListener action) {
 		viewChartButton.addActionListener(action);
 	}
 
 	public void doubleClickTableAction(MouseAdapter action) {
 		tradingTable.addMouseListener(action);
-	}
-
-	public void lookAndFeelAction(ItemListener listener) {
-		for (JRadioButtonMenuItem m : lookAndFeelMenuItems) {
-			m.addItemListener(listener);
-		}
-	}
-
-	public void macWindowTitleAction(ItemListener listener) {
-		macWindowTitleMenuItem.addItemListener(listener);
 	}
 
 	public void strageyPreferencesAction(ActionListener action) {
@@ -217,7 +176,6 @@ public class MainFrame extends JFrame implements ModelListener {
 		getContentPane().setLayout(new BorderLayout());
 
 		int menuKeyMask = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
-
 		// file menu //////////////////////////////////////////////////////////
 		JMenu fileMenu = new JMenu("File");
 		fileMenu.setMnemonic('F');
@@ -264,24 +222,10 @@ public class MainFrame extends JFrame implements ModelListener {
 			}
 		});
 
-		// view menu //////////////////////////////////////////////////////////
-		JMenu viewMenu = new JMenu("View");
-		viewMenu.setMnemonic('V');
-		buttonGroupLookAndFeel = new ButtonGroup();
-		for (UIManager.LookAndFeelInfo lnf : getInstalledLookAndFeels()) {
-			JRadioButtonMenuItem lookAndFeeButtonMenu = new JRadioButtonMenuItem(lnf.getName());
-			viewMenu.add(lookAndFeeButtonMenu);
-			buttonGroupLookAndFeel.add(lookAndFeeButtonMenu);
-			lookAndFeelMenuItems.add(lookAndFeeButtonMenu);
-		}
-		viewMenu.addSeparator();
-		macWindowTitleMenuItem = new JCheckBoxMenuItem("Liquid mac decoration");
-		viewMenu.add(macWindowTitleMenuItem);
 		// menu bar ///////////////////////////////////////////////////////////
 		JMenuBar menuBar = new JMenuBar();
 		menuBar.add(fileMenu);
 		menuBar.add(toolsMenu);
-		menuBar.add(viewMenu);
 		setJMenuBar(menuBar);
 
 		// buttons panel //////////////////////////////////////////////////////
@@ -322,7 +266,6 @@ public class MainFrame extends JFrame implements ModelListener {
 		columnModel.getColumn(12).setPreferredWidth(120); // Trade distribution
 
 		tradingScroll.getViewport().add(tradingTable);
-		// mainPanel.add(tradingPanel, BorderLayout.CENTER);
 
 		Image appIcon = Toolkit.getDefaultToolkit().getImage(getImageURL("resources" + fileSep + "JSystemTrader.jpg"));
 		setIconImage(appIcon);
@@ -335,62 +278,4 @@ public class MainFrame extends JFrame implements ModelListener {
 		pack();
 	}
 
-	public String getSelectedLookAndFeel() {
-		String selected = null;
-		for (JRadioButtonMenuItem m : lookAndFeelMenuItems) {
-			if (m.isSelected()) {
-				selected = m.getText();
-				break;
-			}
-		}
-
-		assert (selected != null);
-
-		for (UIManager.LookAndFeelInfo lnf : getInstalledLookAndFeels()) {
-			if (selected.equals(lnf.getName()))
-				return lnf.getClassName();
-		}
-
-		assert (false);
-		return null;
-	}
-
-	public void setSelectedLookAndFeel(String className) {
-		for (UIManager.LookAndFeelInfo lnf : getInstalledLookAndFeels()) {
-			if (className.equals(lnf.getClassName())) {
-				for (JRadioButtonMenuItem m : lookAndFeelMenuItems) {
-					if (m.getText().equals(lnf.getName())) {
-						m.setSelected(true);
-						break;
-					}
-				}
-				break;
-			}
-		}
-		assert (false);
-	}
-
-	public void setMacWindowTitle(boolean state) {
-		macWindowTitleMenuItem.setSelected(state);
-	}
-
-	/**
-	 * Get all installed LookAndFeels
-	 * 
-	 * @return Vector with LookAndFeelInfo
-	 */
-	public Vector<UIManager.LookAndFeelInfo> getInstalledLookAndFeels() {
-		Vector<UIManager.LookAndFeelInfo> installedLaF = new Vector<UIManager.LookAndFeelInfo>();
-		boolean foundLiquid = false;
-
-		for (UIManager.LookAndFeelInfo lookAndFeelInfo : UIManager.getInstalledLookAndFeels()) {
-			installedLaF.add(lookAndFeelInfo);
-
-			if (lookAndFeelInfo.getClassName().equalsIgnoreCase("com.birosoft.liquid.LiquidLookAndFeel"))
-				foundLiquid = true;
-		}
-
-	
-		return installedLaF;
-	}
 }

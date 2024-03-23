@@ -1,13 +1,15 @@
 package com.jsystemtrader.platform.util;
 
-import java.io.*;
-import java.nio.channels.*;
+import java.io.File;
+import java.io.RandomAccessFile;
+import java.nio.channels.FileChannel;
 
 /**
  * Ensures that only one instance of an app is running.
  */
 public class AppInstanceChecker {
-    public AppInstanceChecker(String appName) {
+    @SuppressWarnings("resource")
+	public AppInstanceChecker(String appName) {
         try {
             File file = new File(System.getProperty("user.home"), appName + ".tmp");
             FileChannel channel = new RandomAccessFile(file, "rw").getChannel();

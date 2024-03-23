@@ -1,5 +1,6 @@
 package com.jsystemtrader.platform.model;
 
+@SuppressWarnings("serial")
 public class JSystemTraderException extends Exception {
     public JSystemTraderException(String message) {
         super(message);

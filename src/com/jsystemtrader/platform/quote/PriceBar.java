@@ -1,9 +1,9 @@
 package com.jsystemtrader.platform.quote;
 
-import com.opentick.*;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
-import java.text.*;
-import java.util.*;
+import com.opentick.OTOHLC;
 
 /**
  * Encapsulates the price bar information.

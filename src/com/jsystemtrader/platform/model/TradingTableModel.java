@@ -1,14 +1,17 @@
 package com.jsystemtrader.platform.model;
 
-import com.jsystemtrader.platform.optimizer.*;
-import com.jsystemtrader.platform.position.*;
-import com.jsystemtrader.platform.quote.*;
-import com.jsystemtrader.platform.strategy.*;
-
+import java.lang.reflect.Constructor;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.prefs.Preferences;
-import java.lang.reflect.*;
-import java.text.*;
-import java.util.*;
+
+import com.jsystemtrader.platform.optimizer.StrategyParams;
+import com.jsystemtrader.platform.position.PositionManager;
+import com.jsystemtrader.platform.quote.PriceBar;
+import com.jsystemtrader.platform.strategy.Strategy;
 
 /**
  */
@@ -31,7 +34,6 @@ public class TradingTableModel extends TableDataModel {
         K("Kelly", Double.class),
         TradeDistribution("Trade Distribution", String.class);
 
-        
         private final String columnName;
         private final Class<?> columnClass;
 
@@ -41,26 +43,22 @@ public class TradingTableModel extends TableDataModel {
         }
     }
 
-
     private final Map<Integer, Strategy> rows = new HashMap<Integer, Strategy>();
     private final DecimalFormat nf4;
     private final Preferences jprefs;
     private final String strategyStatusPrefix = "run.strategy.";
     private final String strategyTickerPrefix = "run.strategy.ticker.name.";
- 
     private boolean editable = true;
-    
+ 
     public TradingTableModel() throws JSystemTraderException {
 
         Column[] columns = Column.values();
         ArrayList<String> allColumns = new ArrayList<String>();
         for (Column column : columns) {
             allColumns.add(column.columnName);
-
         }
-
+        
         setSchema(allColumns.toArray(new String[columns.length]));
-
         jprefs = Preferences.userNodeForPackage(getClass());
 
         nf4 = (DecimalFormat) NumberFormat.getNumberInstance();
@@ -100,30 +98,8 @@ public class TradingTableModel extends TableDataModel {
     }
 
     public ArrayList<Strategy> getAllStrategies( ) throws JSystemTraderException {
-    	ArrayList<Strategy> strategies = new ArrayList<Strategy>();
-
-    	int rowCount = getRowCount();
-    	for (int row = 0; row < rowCount; row++) {
-    		Object[] rowData = getRow(row);
-    		Strategy strategy = getStrategyForRow(row);
-
-    		try {
-    			Class<?> clazz = Class.forName(strategy.getClass().getName());
-    			Constructor<?> ct = clazz.getConstructor(StrategyParams.class);
-    			strategy = (Strategy) ct.newInstance(new StrategyParams());
-    			rows.put(row, strategy);
-
-    		} catch (Exception e) {
-    			throw new JSystemTraderException(e);
-    		}
-
-
-    		strategies.add(strategy);
-    	}
-
-    	return strategies;
+        return new ArrayList<Strategy>(rows.values());
     }
-
     
     public ArrayList<Strategy> getSelectedStrategies(  ) throws JSystemTraderException {
         ArrayList<Strategy> selectedStrategies = new ArrayList<Strategy>();
@@ -157,7 +133,6 @@ public class TradingTableModel extends TableDataModel {
         return selectedStrategies;
     }
 
-
     private int findStrategy(Strategy strategy) {
         int row = -1;
         for (Map.Entry<Integer, Strategy> mapEntry : rows.entrySet()) {
@@ -170,9 +145,8 @@ public class TradingTableModel extends TableDataModel {
         return row;
     }
 
-
     public synchronized void updateStrategy(Strategy strategy) {
-        int row = findStrategy(strategy);
+    	int row = findStrategy(strategy);
         PriceBar lastPriceBar = strategy.getQuoteHistory().size()>0 ? strategy.getLastPriceBar() : null;
         PositionManager positionManager = strategy.getPositionManager();
 
@@ -215,8 +189,8 @@ public class TradingTableModel extends TableDataModel {
     }
 
     public void addStrategy(Strategy strategy) {
+    
         Object[] row = new Object[getColumnCount()];
-
         String strategyName = strategy.getClass().getName();
         boolean strategyStatus;
 
@@ -226,7 +200,6 @@ public class TradingTableModel extends TableDataModel {
         row[Column.Strategy.ordinal()] = strategy.getName();
         
         //<---addded by yan
-   
         String prefTicker  = (jprefs.get(strategyTickerPrefix + strategyName,
         		strategy.getContract().m_symbol));
         
