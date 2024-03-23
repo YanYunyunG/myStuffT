@@ -28,10 +28,11 @@ public class StrategyPreference {
 	
 	}
 	
+
 	public static StrategyPreference create( String value ) throws JSystemTraderException 
 	{	
 		String[] values = value.split(",");
-		StrategyPreference ref = new StrategyPreference( values[0],new Integer( values[1]),values[2],values[3]);
+		StrategyPreference ref = new StrategyPreference( values[0],Integer.valueOf( values[1]),values[2],values[3]);
 	
 		return ref;
 	}

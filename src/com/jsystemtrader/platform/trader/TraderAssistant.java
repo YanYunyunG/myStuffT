@@ -1,18 +1,26 @@
 package com.jsystemtrader.platform.trader;
 
-import com.ib.client.*;
-import com.jsystemtrader.platform.model.*;
-import com.jsystemtrader.platform.position.*;
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.swing.JOptionPane;
+
+import com.ib.client.Contract;
+import com.ib.client.EClientSocket;
+import com.ib.client.ExecutionFilter;
+import com.ib.client.Order;
+import com.jsystemtrader.platform.model.Dispatcher;
+import com.jsystemtrader.platform.model.JSystemTraderException;
+import com.jsystemtrader.platform.model.ModelListener;
+import com.jsystemtrader.platform.position.OpenOrder;
+import com.jsystemtrader.platform.position.PortfolioMirrorItem;
 import com.jsystemtrader.platform.preferences.JSTPreferences;
 import com.jsystemtrader.platform.preferences.PreferencesHolder;
-import com.jsystemtrader.platform.quote.*;
-import com.jsystemtrader.platform.report.*;
-import com.jsystemtrader.platform.startup.*;
-import com.jsystemtrader.platform.strategy.*;
-import com.jsystemtrader.platform.util.*;
-
-import javax.swing.*;
-import java.util.*;
+import com.jsystemtrader.platform.quote.QuoteHistory;
+import com.jsystemtrader.platform.report.Report;
+import com.jsystemtrader.platform.startup.JSystemTrader;
+import com.jsystemtrader.platform.strategy.Strategy;
+import com.jsystemtrader.platform.util.TimeSyncChecker;
 
 
 public class TraderAssistant {
@@ -99,7 +107,6 @@ public class TraderAssistant {
         return serverVersion;
     }
 
-
     public void disconnect() {
         if (socket != null && socket.isConnected()) {
             socket.cancelNewsBulletins();
@@ -145,12 +152,9 @@ public class TraderAssistant {
         QuoteHistory qh = strategy.getQuoteHistory();
         
         if ( strategy.getSecondBarSize() != null &&
-        		duration.equals( strategy.getSecondBarSize().getHistRequestDuration()))
-        {
+        		duration.equals( strategy.getSecondBarSize().getHistRequestDuration())) {
         	qh = strategy.getSecondHQ();
-        	
-        }
-        		
+        }   		
         qh.setIsHistRequestCompleted(false);
 
         String msg = qh.getStrategyName() + ": " + "Requested Historical data. ";
@@ -174,8 +178,7 @@ public class TraderAssistant {
         strategies.put(nextStrategyID, strategy);
         
         PortfolioMirrorItem portfolioMirrorItem = portfolioMirror.get(_generateContractKey(strategy.getContract()));
-        if(portfolioMirrorItem!=null)
-        {
+        if(portfolioMirrorItem!=null) {
             strategy.getPositionManager().update(portfolioMirrorItem);
             Dispatcher.fireModelChanged(ModelListener.Event.STRATEGY_UPDATE, strategy);
         }
@@ -207,11 +210,11 @@ public class TraderAssistant {
         order.m_action = action;
         order.m_totalQuantity = quantity;
         order.m_orderType = "MKT";
-        if (advisorAccountID.length() != 0)
+        if (advisorAccountID.length() != 0) {
             order.m_account = advisorAccountID;
+        }
         placeOrder(contract, order, strategy);
     }
-
 
     public void setOrderID(int orderID) {
         this.orderID = orderID;
@@ -228,7 +231,6 @@ public class TraderAssistant {
         } catch (InterruptedException ie) {
             throw new JSystemTraderException(ie);
         }
-
         return serverTime;
     }
 
@@ -270,23 +272,27 @@ public class TraderAssistant {
         return isAccepted;
     }
 
-    public synchronized void updatePortfolio(Contract contract, int position, double marketPrice, double marketValue, double averageCost,
-                                             double unrealizedPNL, double realizedPNL, String accountName)
+    public synchronized void updatePortfolio(
+    		Contract contract, 
+    		int position, 
+    		double marketPrice,
+    		double marketValue, 
+    		double averageCost,
+    		double unrealizedPNL, 
+    		double realizedPNL, 
+    		String accountName)
     {
         PortfolioMirrorItem portfolioMirrorItem = new PortfolioMirrorItem(contract, position, marketPrice, marketValue, averageCost, unrealizedPNL, realizedPNL, accountName);
         portfolioMirror.put(_generateContractKey(contract), portfolioMirrorItem);
 
-        for(Strategy strategy : strategies.values())
-        {
-           if(strategy.getContract().m_symbol.equals(portfolioMirrorItem.getContract().m_symbol))
-           {
+        for(Strategy strategy : strategies.values()) {
+           if(strategy.getContract().m_symbol.equals(portfolioMirrorItem.getContract().m_symbol)) {
                strategy.getPositionManager().update(portfolioMirrorItem);
                Dispatcher.fireModelChanged(ModelListener.Event.STRATEGY_UPDATE, strategy);
            }
         }
     }
-
-
+  
     private String _generateContractKey(Contract contract)
     {
         if(contract==null)

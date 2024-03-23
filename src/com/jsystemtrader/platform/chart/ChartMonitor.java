@@ -1,9 +1,12 @@
 package com.jsystemtrader.platform.chart;
 
-import org.jfree.chart.*;
+import java.awt.Cursor;
+import java.awt.Graphics;
 
-import java.awt.*;
+import org.jfree.chart.ChartPanel;
+import org.jfree.chart.JFreeChart;
 
+@SuppressWarnings("serial")
 public class ChartMonitor extends ChartPanel {
 
     public ChartMonitor(JFreeChart chart, boolean useBuffer) {

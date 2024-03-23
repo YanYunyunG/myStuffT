@@ -9,55 +9,49 @@ import com.jsystemtrader.platform.strategy.StrategyPreferences;
 /**
  * Strategy parameters table model.
  */
+@SuppressWarnings("serial")
 public class StrategyTickerTableModel extends TableDataModel {
 	
 	 enum Column {
-	        Ticker("Ticker", String.class),
-	        TradeShareVolumn("Long Volumn", Integer.class),
-	        TradeStartTime("Trade Start", String.class),
-	        TradeEndTime("Trade End", String.class);
+		 Ticker("Ticker", String.class),
+	     TradeShareVolumn("Long Volumn", Integer.class),
+	     TradeStartTime("Trade Start", String.class),
+	     TradeEndTime("Trade End", String.class);   
 	        
-	        private final String columnName;
-	        private final Class<?> columnClass;
+		 private final String columnName;
+	     private final Class<?> columnClass;
 
-	        Column(String columnName, Class<?> columnClass) {
-	            this.columnName = columnName;
-	            this.columnClass = columnClass;
-	        }
-	    }
+	     Column(String columnName, Class<?> columnClass) {
+	    	 this.columnName = columnName;
+	    	 this.columnClass = columnClass;
+	     }
+	}
 
-    public StrategyTickerTableModel() {
-    	
+    public StrategyTickerTableModel() {	
     	 Column[] columns = Column.values();
          ArrayList<String> allColumns = new ArrayList<String>();
-      
+     
          for (Column column : columns) {
              allColumns.add(column.columnName);
          }
-
          setSchema(allColumns.toArray(new String[columns.length]));
     }
 
       @Override
-    public Class<?> getColumnClass(int col)
-    {
-        Column column = Column.values()[col];
-        return column.columnClass;
+    public Class<?> getColumnClass(int col) {
+       return Column.values()[col].columnClass;
     }
-
+     
     @Override
-    public boolean isCellEditable(int row, int col)
-    {
+    public boolean isCellEditable(int row, int col) {
     	return true;
     }
     
-    public void removeRowAt( int row)
-    {
+    public void removeRowAt( int row) {
     	removeRow( row);
     }
    
-    public void addTickerPreference( StrategyPreference tpref )
-    {	
+    public void addTickerPreference( StrategyPreference tpref ) {
     	 Object[] row = new Object[getColumnCount() + 1];
          row[0] = tpref.getTickerSymbol();
          row[1] = tpref.getTradeShareVolumn();
@@ -74,23 +68,15 @@ public class StrategyTickerTableModel extends TableDataModel {
         }
     }
     
-    
-    public StrategyPreferences getPreferences() 
-    {
+    public StrategyPreferences getPreferences() {
     	StrategyPreferences prefs = new StrategyPreferences();
 
-    	for( int idx =0; idx < getRowCount(); idx++ )
-    	{
+    	for( int idx =0; idx < getRowCount(); idx++ ) {
     		Object[] values = getRow( idx);
-
     		prefs.addPreference( new StrategyPreference((String)values[0],
-    				 (Integer)values[1],(String)values[2], (String)values[3]));
+    				(Integer)values[1],(String)values[2], (String)values[3]));
     	}
     	return prefs;
-
- 
     }
     
-   
-
 }

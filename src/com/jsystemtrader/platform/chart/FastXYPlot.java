@@ -1,20 +1,25 @@
 package com.jsystemtrader.platform.chart;
 
-import org.jfree.chart.axis.*;
-import org.jfree.chart.plot.*;
-import org.jfree.chart.renderer.*;
-import org.jfree.chart.renderer.xy.*;
-import org.jfree.data.general.*;
-import org.jfree.data.xy.*;
-import org.jfree.ui.*;
+import java.awt.Graphics2D;
+import java.awt.geom.Rectangle2D;
+import java.util.HashSet;
 
-import java.awt.*;
-import java.awt.geom.*;
-import java.util.*;
+import org.jfree.chart.axis.ValueAxis;
+import org.jfree.chart.plot.CrosshairState;
+import org.jfree.chart.plot.PlotRenderingInfo;
+import org.jfree.chart.plot.SeriesRenderingOrder;
+import org.jfree.chart.plot.XYPlot;
+import org.jfree.chart.renderer.RendererUtils;
+import org.jfree.chart.renderer.xy.XYItemRenderer;
+import org.jfree.chart.renderer.xy.XYItemRendererState;
+import org.jfree.chart.ui.RectangleEdge;
+import org.jfree.data.general.DatasetUtils;
+import org.jfree.data.xy.XYDataset;
 
 /**
  * Performs fast rendering of large datasets in nearly constant time.
  */
+@SuppressWarnings("serial")
 public class FastXYPlot extends XYPlot {
     private final HashSet<Integer> renderedPixels = new HashSet<Integer>();
 
@@ -47,7 +52,7 @@ public class FastXYPlot extends XYPlot {
     public boolean render(Graphics2D g2, Rectangle2D dataArea, int index, PlotRenderingInfo info, CrosshairState crosshairState) {
         boolean foundData = false;
         XYDataset dataset = getDataset(index);
-        if (!DatasetUtilities.isEmptyOrNull(dataset)) {
+        if (!DatasetUtils.isEmptyOrNull(dataset)) {
             foundData = true;
             ValueAxis xAxis = getDomainAxisForDataset(index);
             ValueAxis yAxis = getRangeAxisForDataset(index);
@@ -79,7 +84,7 @@ public class FastXYPlot extends XYPlot {
                             continue;
                         }
                         if (state.getProcessVisibleItemsOnly()) {
-                            int[] itemBounds = RendererUtilities.findLiveItems(dataset, series, xAxis.getLowerBound(), xAxis.getUpperBound());
+                            int[] itemBounds = RendererUtils.findLiveItems(dataset, series, xAxis.getLowerBound(), xAxis.getUpperBound());
                             firstItem = itemBounds[0];
                             lastItem = itemBounds[1];
                         }
@@ -100,7 +105,7 @@ public class FastXYPlot extends XYPlot {
                         int firstItem = 0;
                         int lastItem = dataset.getItemCount(series) - 1;
                         if (state.getProcessVisibleItemsOnly()) {
-                            int[] itemBounds = RendererUtilities.findLiveItems(dataset, series, xAxis.getLowerBound(), xAxis.getUpperBound());
+                            int[] itemBounds = RendererUtils.findLiveItems(dataset, series, xAxis.getLowerBound(), xAxis.getUpperBound());
                             firstItem = itemBounds[0];
                             lastItem = itemBounds[1];
                         }

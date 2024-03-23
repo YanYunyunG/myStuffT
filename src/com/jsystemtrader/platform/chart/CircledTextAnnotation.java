@@ -1,13 +1,21 @@
 package com.jsystemtrader.platform.chart;
 
-import org.jfree.chart.annotations.*;
-import org.jfree.chart.axis.*;
-import org.jfree.chart.plot.*;
-import org.jfree.text.*;
-import org.jfree.ui.*;
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Graphics2D;
+import java.awt.Paint;
+import java.awt.Stroke;
+import java.awt.geom.Ellipse2D;
+import java.awt.geom.Rectangle2D;
 
-import java.awt.*;
-import java.awt.geom.*;
+import org.jfree.chart.annotations.XYTextAnnotation;
+import org.jfree.chart.axis.ValueAxis;
+import org.jfree.chart.plot.Plot;
+import org.jfree.chart.plot.PlotOrientation;
+import org.jfree.chart.plot.PlotRenderingInfo;
+import org.jfree.chart.plot.XYPlot;
+import org.jfree.chart.ui.RectangleEdge;
+import org.jfree.chart.text.TextUtils;
 
 /**
  * Defines the shape of the markers which show order executions on the
@@ -16,6 +24,7 @@ import java.awt.geom.*;
  * designating the "long", "short", and "flat" positions resulting from
  * order executions.
  */
+@SuppressWarnings("serial")
 public class CircledTextAnnotation extends XYTextAnnotation {
     private final int radius;
     private Color color;
@@ -71,6 +80,6 @@ public class CircledTextAnnotation extends XYTextAnnotation {
             }
             quantity = String.valueOf(intquantity);
         }
-        TextUtilities.drawRotatedString(quantity, g2, anchorX, anchorY, getTextAnchor(), getRotationAngle(), getRotationAnchor());
+        TextUtils.drawRotatedString(quantity, g2, anchorX, anchorY, getTextAnchor(), getRotationAngle(), getRotationAnchor());
     }
 }
